@@ -3,10 +3,11 @@ import random
 from datetime import datetime, timedelta
 from faker import Faker
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+import logging
 
 fake = Faker()
 
-# USERS
+# Генерация данных пользователей
 
 def generate_users():
     return [{
@@ -22,7 +23,7 @@ def generate_users():
         "country": fake.country()
     } for _ in range(10)]
 
-# ACTIVITY
+# Генерация данных активности пользователей
 
 def generate_sessions(users):
     sessions = []
@@ -47,7 +48,7 @@ def generate_events(sessions):
         "timestamp": s["start_time"]
     } for s in sessions for _ in range(random.randint(1, 4))]
 
-# ORDERS
+# Генерация данных по заказам пользователей
 
 def generate_orders(users):
     categories = ["electronics", "books", "clothes", "toys"]
@@ -81,7 +82,8 @@ def generate_orders(users):
         })
     return orders
 
-# MARKETING
+# Генерация данных по маркетинговым кампаниям,
+# пользователям, участвующим в данных кампаниях
 
 def generate_campaigns():
     return [{
@@ -99,7 +101,7 @@ def generate_user_campaigns(users, campaigns):
         "campaign_id": random.choice(campaigns)["campaign_id"]
     } for u in users if random.random() < 0.5]
 
-# UPLOAD TO MINIO
+# Загрузка сгенерированных данных в Minio
 
 def upload_json_to_minio(data, name):
     hook = S3Hook(aws_conn_id='minio_default')
@@ -119,6 +121,9 @@ def upload_json_to_minio(data, name):
         encoding='utf-8'
     )
 
+    logging.info(f'Файл {filename} загружен в Minio')
+
+# Главная функция по генерации всех данных
 
 def generate_all_data():
     users = generate_users()
@@ -139,3 +144,5 @@ def generate_all_data():
 
     for name, items in data.items():
         upload_json_to_minio(items, name)
+
+    logging.info('Данные успешно сгенерированы')

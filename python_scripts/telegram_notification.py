@@ -1,13 +1,17 @@
 from datetime import datetime
 import requests
-from airflow.models import Variable
+import os
+from dotenv import load_dotenv
 
-token = Variable.get('token')
+# Загружаем переменные из .env
+load_dotenv()
+token = os.getenv("TELEGRAM_TOKEN")
+chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
 def send_telegram_notification(message: str):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     payload = {
-        'chat_id': '-4805082079',
+        'chat_id': chat_id,
         'text': message,
     }
 
