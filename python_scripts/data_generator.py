@@ -115,7 +115,7 @@ def upload_json_to_minio(data, name):
 
     hook.load_string(
         string_data=body,
-        key=filename,
+        key=f'/{name}/' + filename,
         bucket_name=bucket_name,
         replace=False,
         encoding='utf-8'
@@ -139,7 +139,7 @@ def generate_all_data():
         "events": events,
         "orders": orders,
         "campaigns": campaigns,
-        "user_campaigns": user_campaigns
+        "userCampaigns": user_campaigns
     }
 
     for name, items in data.items():
